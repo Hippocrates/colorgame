@@ -34,7 +34,7 @@ public class GameScreen extends GameState {
 			for (ColorType c : ColorType.values()) {
 				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
 			}
-			
+
 			loadMap("res/map/testout.map");
 			
 		} catch (IOException e) {
@@ -112,32 +112,60 @@ public class GameScreen extends GameState {
 			}
 		}
 		
-		Vector plr1CamTarget = plr1.getCameraTarget();
-		Vector plr2CamTarget = plr2.getCameraTarget();
+		scrollCamera();
+	}
+	
+	public void scrollCamera() {
+		Vector plr1CamTarget = plr1.getCenter();
+		Vector plr2CamTarget = plr2.getCenter();
 		
 		Vector cameraTarget = plr1CamTarget.add(plr2CamTarget).mul(0.5f).sub(camera.viewSize.mul(0.5f));
-		cameraTarget.y = 0.0f;
 		
 		Vector cameraDelta = cameraTarget.sub(camera.position);
 		
-		float hardConstraintLeft = Math.min(plr1.pos.x, plr2.pos.x);
-		float hardConstraintRight = Math.max(plr1.pos.x + PLR_X, plr2.pos.x + PLR_X);
+		AABBox plr1Box = plr1.getCollisionBox();
+		AABBox plr2Box = plr2.getCollisionBox();
 		
-		if (cameraDelta.length() > 1.0) {
+		float tileMapSize = tileMap.getWidth() * TILE_X;
+		
+		float hardConstraintLeft = 0.0f;
+		float hardConstraintRight = tileMapSize - camera.viewSize.x;
+		
+		if (tileMapSize < camera.viewSize.x) {
+			hardConstraintLeft = (tileMapSize / 2.0f) - (camera.viewSize.x / 2.0f);
+			hardConstraintRight = (tileMapSize / 2.0f) + (camera.viewSize.x / 2.0f);
+		}
+		
+		hardConstraintLeft = Math.max(hardConstraintLeft, Math.max(plr1Box.maxX, plr2Box.maxX) - camera.viewSize.x);
+		hardConstraintRight = Math.min(hardConstraintRight, Math.min(plr1Box.minX, plr2Box.minX));
+		
+		float hardConstraintBottom = Math.max(0.0f, Math.max(plr1Box.maxY, plr2Box.maxY) - camera.viewSize.y); 
+		float hardConstraintTop =  Math.min(plr1Box.minY, plr2Box.minY);
+		
+		if (Math.abs(cameraDelta.x) > 48) {
+			cameraDelta.x *= 48 / Math.abs(cameraDelta.x);
+		}
+		
+		camera.position.x += cameraDelta.x;
+
+		if (Math.abs(cameraDelta.y) > 128) {
+			cameraDelta.y *= 128 / Math.abs(cameraDelta.y);
+		}
 			
-			if (cameraDelta.length() > 2.0f) {
-				cameraDelta = cameraDelta.scale(2.0f);
-			}
-			
-			camera.position = camera.position.add(cameraDelta);
-			/*
-			if (camera.position.x < hardConstraintLeft) {
-				camera.position.x = hardConstraintLeft;
-			}
-			
-			if (camera.position.x > hardConstraintRight) {
-				camera.position.x = hardConstraintRight;
-			}*/
+		camera.position.y += cameraDelta.y;	
+		
+		if (camera.position.x < hardConstraintLeft) {
+			camera.position.x = hardConstraintLeft;
+		}
+		else if (camera.position.x > hardConstraintRight) {
+			camera.position.x = hardConstraintRight;
+		}
+		
+		if (camera.position.y < hardConstraintBottom) {
+			camera.position.y = hardConstraintBottom;
+		}
+		else if (camera.position.y > hardConstraintTop) {
+			camera.position.y = hardConstraintTop;
 		}
 	}
 	

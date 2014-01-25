@@ -40,6 +40,7 @@ public class Player {
 	public Vector pos;
 	public float xv;
 	public float yv;
+
 	public final float maxxv = 48;
 	public final float maxyv = 128;
 	public final float xa = 80;
@@ -132,10 +133,6 @@ public class Player {
 	
 	public Vector getCenter() {
 		return getCollisionBox().getCenter();
-	}
-	
-	public Vector getCameraTarget() {
-		return getCenter().add(new Vector((facingRight ? 1.0f : -1.0f) * 32.0f, 0.0f));
 	}
 	
 	public ColorType getColor() {
