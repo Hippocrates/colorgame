@@ -90,7 +90,9 @@ public class GameWindow extends JFrame {
 		if(state == null) {return;}
 		
 		if(!stateStack.isEmpty()) {
-			stateStack.peek().pause();
+			GameState oldState = stateStack.peek();
+			removeKeyListener(oldState);
+			oldState.pause();
 		}
 		stateStack.add(state);
 		state.master = this;
@@ -115,7 +117,9 @@ public class GameWindow extends JFrame {
 			//WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
             //Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 		} else {
-			stateStack.peek().resume();
+			GameState newState = stateStack.peek();
+			newState.resume();
+			addKeyListener(newState);
 		}
 	}
 }
