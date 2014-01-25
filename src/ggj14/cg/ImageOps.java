@@ -11,9 +11,9 @@ public final class ImageOps {
 		for (int y = 0; y < input.getHeight(); ++y) {
 			for (int x = 0; x < input.getWidth(); ++x) {
 				
-				Color original = new Color(copy.getRGB(x, y));
+				Color original = new Color(input.getRGB(x, y));
 				
-				double scale = (double) original.getRed() / 255.0;
+				double scale = ((double) original.getRed()) / 255.0;
 				
 				double redScale = scale * targetColor.getRed();
 				double blueScale = scale * targetColor.getBlue();
