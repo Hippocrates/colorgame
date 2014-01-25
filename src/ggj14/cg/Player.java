@@ -15,7 +15,7 @@ public class Player {
 	
 	public void jumpPressed() {
 		if (!isFalling) {
-			yv = 60;
+			yv = 80;
 			isFalling = true;
 		}
 	}
@@ -40,9 +40,9 @@ public class Player {
 	public float xv;
 	public float yv;
 	public final float maxxv = 32;
-	public final float maxyv = 48;
-	public final float xa = 32;
-	public final float ya = 32;
+	public final float maxyv = 96;
+	public final float xa = 40;
+	public final float ya = 60;
 	
 	private ColorType color;
 	private int animX;
@@ -84,8 +84,10 @@ public class Player {
 			}
 		}
 		
-		pos.x += Math.max(-0.5, Math.min(0.5, (xv * s)));
-		pos.y += Math.max(-0.5, Math.min(0.5, (yv * s)));
+		/*pos.x += Math.max(-0.5, Math.min(0.5, (xv * s)));
+		pos.y += Math.max(-0.5, Math.min(0.5, (yv * s)));*/
+		pos.x += xv * s;
+		pos.y += yv * s;
 		
 		CollisionResult result = CollisionOps.collidePlayerToWorld(this, tileMap);
 		
@@ -107,9 +109,9 @@ public class Player {
 		//update the player's animation
 		if(isFalling) {
 			animY = 0;
-			if(yv > 8) {
+			if(yv > 12) {
 				animX = 7;
-			} else if(yv < -8) {
+			} else if(yv < -12) {
 				animX = 1;
 			} else {
 				animX = 0;
