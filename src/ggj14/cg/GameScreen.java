@@ -35,7 +35,7 @@ public class GameScreen extends GameState {
 				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
 			}
 			
-			loadMap("res/map/testred.map");
+			loadMap("res/map/testout.map");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

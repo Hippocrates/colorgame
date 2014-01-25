@@ -32,4 +32,21 @@ public class SpriteSheet {
 	{
 		return images[x][y];
 	}
+	
+	public BufferedImage getImage(int n)
+	{
+		return images[n % images.length][n / images.length];
+	}
+	
+	public BufferedImage getRootImage() {
+		return rootImage;
+	}
+	
+	public int getNumTilesX() {
+		return images.length;
+	}
+	
+	public int getNumTilesY() {
+		return images[0].length;
+	}
 }
