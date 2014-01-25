@@ -1,13 +1,89 @@
 package ggj14.cg;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+
 public class GameScreen extends GameState {
 	
-	public TileMap tileMap;
+	public static final int TILE_X = 16;
+	public static final int TILE_Y = 16;
 	
+	public GameScreen()
+	{
+		try {
+			BufferedImage originalImage = ImageIO.read(new File("res/img/tilesheet.png"));
+			tileSets = new SpriteSheet[ColorType.size()];
+			for (ColorType c : ColorType.values()) {
+				tileSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), TILE_X, TILE_Y);
+			}
+			
+			loadMap("res/map/testred.map");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	public SpriteSheet tileSets[];
+	public TileMap tileMap;
+	public Camera camera;
+	
+	public void keyEvent(KeyEvent ev, boolean type)
+	{
+		
+	}
+	
+	public void keyPressed(KeyEvent ev) {
+		keyEvent(ev, true);
+	}
+	
+	public void keyReleased(KeyEvent ev) {
+		keyEvent(ev, false);
+	}
+	
+	public void update(double s)
+	{
+	}
+	
+	public void draw(Graphics g, int width, int height) {
+		
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.scale(1, -1);
+		g2d.translate(0, -height);
+		
+		camera.screenSize.x = width;
+		camera.screenSize.y = height;
+		
+		AABBox cameraBounds = camera.getViewBounds();
+		
+		int leftMostTileInside = (int) Math.max(Math.floor(cameraBounds.minX / TILE_X), 0);
+		int bottomMostTileInside = (int) Math.max(Math.floor(cameraBounds.minY / TILE_Y), 0);
+		int rightMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxX / TILE_X), tileMap.getWidth() - 1);
+		int topMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxY / TILE_Y), tileMap.getHeight() - 1);
+		
+		for (int y = bottomMostTileInside; y <= topMostTileInside; ++y) {
+			for (int x = leftMostTileInside; x <= rightMostTileInside; ++x) {
+				Vector position = camera.screenToView(new Vector(x * TILE_X, y * TILE_Y));
+				
+				Tile tile = tileMap.getTile(x, y);
+				BufferedImage image = tileSets[tile.getColor().ordinal()].getImage(tile.getType());
+				
+				g2d.drawImage(image, (int)position.x, (int)position.y, (int)position.x + TILE_X, (int)position.y + TILE_Y, 0, 0, TILE_X, TILE_Y, null);
+			}
+		}
+		
+	}
 	
 	public void loadMap(String filename) throws IOException {
 		
@@ -22,11 +98,11 @@ public class GameScreen extends GameState {
 			
 			tileMap = new TileMap(width, height);
 			
-			for (int y = 0; y < height; ++y) {
+			for (int y = height - 1; y >= 0; --y) {
 				String line = scanner.nextLine();
 				
 				if (!(line.length() == width*2)) {
-					throw new RuntimeException("Error, line not right size");
+					throw new RuntimeException("Error, tile map line not right size");
 				}
 				
 				for (int x = 0; x < width; ++x) {
@@ -39,6 +115,7 @@ public class GameScreen extends GameState {
 			while (scanner.hasNextLine()) {
 				String createLine = scanner.nextLine();
 				System.out.println(createLine);
+				parseMapLine(createLine.split("\\s+"));
 			}
 		}
 		finally {
@@ -46,5 +123,18 @@ public class GameScreen extends GameState {
 		}
 	}
 	
-	
+	private void parseMapLine(String[] tokens) {
+		String command = tokens[0];
+		
+		if (command == "REMARK") {
+			// do nothing
+		}
+		else if (command.equalsIgnoreCase("CAMERA")) {
+			float cameraX = Float.parseFloat(tokens[1]);
+			float cameraY = Float.parseFloat(tokens[2]);
+			float viewX = Float.parseFloat(tokens[3]);
+			float viewY = Float.parseFloat(tokens[4]);
+			camera = new Camera(new Vector(cameraX, cameraY), new Vector(viewX, viewY), new Vector(GameWindow.WIDTH, GameWindow.HEIGHT));
+		}
+	}
 }

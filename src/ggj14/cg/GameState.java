@@ -28,6 +28,7 @@ public abstract class GameState implements KeyListener {
 	
 	public void update(double s) {}
 	public void draw(Graphics g) {}
+	public void draw(Graphics g, int width, int height) { draw(g); }
 	
 	public void closeState() {
 		if(master == null) {return;}

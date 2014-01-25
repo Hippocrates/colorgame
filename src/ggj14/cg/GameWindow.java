@@ -75,7 +75,7 @@ public class GameWindow extends JFrame {
 						panel.cls();
 						Graphics g = panel.getGraphics();
 						
-						state.draw(g);
+						state.draw(g, panel.getWidth(), panel.getHeight());
 						
 						panel.flip();
 						panel.repaint();

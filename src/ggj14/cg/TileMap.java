@@ -7,6 +7,14 @@ public class TileMap {
 	private int width;
 	private int height;
 	private Tile[] tiles;
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
 
 	public TileMap(int _width, int _height) {
 		width = _width;

@@ -50,4 +50,8 @@ public enum ColorType {
 		
 		return null;
 	}
+	
+	public static int size() {
+		return _all.length;
+	}
 }
