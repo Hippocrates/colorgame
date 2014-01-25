@@ -4,12 +4,14 @@ public class Player {
 	
 	public boolean isWalking;
 	public boolean isFalling;
-	public boolean facingRight;
+	public boolean facingRight = true;
 	public double animTimer;
-	public final double walkAnimLength = 0.25;
+	public final double walkAnimLength = 0.15;
 	
 	//call when left or right pressed
 	public void walkPressed(boolean isRight) {
+		if(isWalking && facingRight == isRight) {return;}
+		
 		isWalking = true;
 		facingRight = isRight;
 		animTimer = 0;
@@ -17,9 +19,9 @@ public class Player {
 	
 	//cal when left or right depressed
 	public void walkStopped(boolean isRight) {
-		if(facingRight == isRight) {
-			isWalking = false;
-		}
+		if(facingRight != isRight) {return;}
+		
+		isWalking = false;
 	}
 	
 	public Vector pos;
@@ -27,8 +29,8 @@ public class Player {
 	public float yv;
 	public final float maxxv = 32;
 	public final float maxyv = 48;
-	public final float xa = 12;
-	public final float ya = 16;
+	public final float xa = 32;
+	public final float ya = 32;
 	
 	private ColorType color;
 	private int animX;

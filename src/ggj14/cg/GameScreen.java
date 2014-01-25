@@ -129,14 +129,27 @@ public class GameScreen extends GameState {
 				
 				image = tileSets[ordinal].getImage(tile.getTileX(), tile.getTileY());
 				
-				g2d.drawImage(image, (int)bottomLeft.x, (int)bottomLeft.y, (int)topRight.x, (int)topRight.y, 0, 0, TILE_X, TILE_Y, null);
+				g2d.drawImage(image, (int)bottomLeft.x, (int)topRight.y, (int)topRight.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
 			}
 		}
 
 		bottomLeft = camera.viewToScreen(plr1.pos);
 		topRight = camera.viewToScreen(new Vector(plr1.pos.x + PLR_X, plr1.pos.y + PLR_Y));
 		image = playerSets[plr1.getColor().ordinal()].getImage(plr1.getAnimX(), plr1.getAnimY());
-		g2d.drawImage(image, (int)bottomLeft.x, (int)topRight.y, (int)topRight.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
+		if(plr1.facingRight) {
+			g2d.drawImage(image, (int)bottomLeft.x, (int)topRight.y, (int)topRight.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
+		} else {
+			g2d.drawImage(image, (int)topRight.x, (int)topRight.y, (int)bottomLeft.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
+		}
+
+		bottomLeft = camera.viewToScreen(plr2.pos);
+		topRight = camera.viewToScreen(new Vector(plr2.pos.x + PLR_X, plr2.pos.y + PLR_Y));
+		image = playerSets[plr2.getColor().ordinal()].getImage(plr2.getAnimX(), plr2.getAnimY());
+		if(plr2.facingRight) {
+			g2d.drawImage(image, (int)bottomLeft.x, (int)topRight.y, (int)topRight.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
+		} else {
+			g2d.drawImage(image, (int)topRight.x, (int)topRight.y, (int)bottomLeft.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
+		}
 		
 	}
 	
@@ -162,8 +175,8 @@ public class GameScreen extends GameState {
 				
 				for (int x = 0; x < width; ++x) {
 					char code = line.charAt(x*3);
-					int tileX = line.charAt(x*3 + 1) - 0x30;
-					int tileY = line.charAt(x*3 + 2) - 0x30;
+					int tileY = line.charAt(x*3 + 1) - 0x30;
+					int tileX = line.charAt(x*3 + 2) - 0x30;
 					tileMap.setTile(x,  y,  tileX, tileY, ColorType.fromCode(code));
 				}
 			}
