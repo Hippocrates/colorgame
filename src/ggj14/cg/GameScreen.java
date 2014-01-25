@@ -23,6 +23,7 @@ public class GameScreen extends GameState {
 	{
 		try {
 			BufferedImage originalImage = ImageIO.read(new File("res/img/tilesheet.png"));
+			System.out.println(originalImage.getType());
 			tileSets = new SpriteSheet[ColorType.size()];
 			for (ColorType c : ColorType.values()) {
 				tileSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), TILE_X, TILE_Y);
@@ -35,9 +36,6 @@ public class GameScreen extends GameState {
 			}
 			
 			loadMap("res/map/testred.map");
-
-			plr1 = new Player(16, 16, ColorType.RED);
-			plr2 = new Player(48, 16, ColorType.MAGENTA);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -204,6 +202,19 @@ public class GameScreen extends GameState {
 			float viewX = Float.parseFloat(tokens[3]);
 			float viewY = Float.parseFloat(tokens[4]);
 			camera = new Camera(new Vector(cameraX, cameraY), new Vector(viewX, viewY), new Vector(GameWindow.WIDTH, GameWindow.HEIGHT));
+		}
+		else if (command.equalsIgnoreCase("PLAYER1") || command.equalsIgnoreCase("PLAYER2")) {
+			int whichPlayer = command.charAt("PLAYER".length()) - 0x30;
+			ColorType color = ColorType.fromCode(tokens[1].charAt(0));
+			float playerX = Float.parseFloat(tokens[2]);
+			float playerY = Float.parseFloat(tokens[3]);
+			if (whichPlayer == 1)
+			{
+				plr1 = new Player(playerX, playerY, color);
+			}
+			else {
+				plr2 = new Player(playerX, playerY, color);
+			}
 		}
 	}
 }

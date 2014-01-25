@@ -19,7 +19,12 @@ public final class ImageOps {
 				double greenScale = scale * targetColor.getGreen();
 				double blueScale = scale * targetColor.getBlue();
 				
-				Color outputColor = new Color((int)redScale, (int)greenScale, (int)blueScale, original.getAlpha());
+				Color outputColor = new Color((int)redScale, (int)greenScale, (int)blueScale, original.getBlue());
+				
+				if (original.getAlpha() == 0)
+				{
+					System.out.println("Here " + original.getAlpha());
+				}
 				
 				copy.setRGB(x, y, outputColor.getRGB());
 			}
