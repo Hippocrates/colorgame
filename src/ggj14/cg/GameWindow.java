@@ -111,6 +111,7 @@ public class GameWindow extends JFrame {
 		if(stateStack.isEmpty()) {
 			//TODO Clean up the game
 			dispose();
+			System.exit(0);
 			//WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
             //Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 		} else {

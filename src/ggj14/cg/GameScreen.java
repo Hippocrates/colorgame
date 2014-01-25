@@ -15,6 +15,9 @@ public class GameScreen extends GameState {
 	
 	public static final int TILE_X = 16;
 	public static final int TILE_Y = 16;
+
+	public static final int PLR_X = 16;
+	public static final int PLR_Y = 16;
 	
 	public GameScreen()
 	{
@@ -25,7 +28,16 @@ public class GameScreen extends GameState {
 				tileSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), TILE_X, TILE_Y);
 			}
 			
+			originalImage = ImageIO.read(new File("res/img/playeranim.png"));
+			playerSets = new SpriteSheet[ColorType.size()];
+			for (ColorType c : ColorType.values()) {
+				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
+			}
+			
 			loadMap("res/map/testred.map");
+
+			plr1 = new Player(16, 16, ColorType.RED);
+			plr2 = new Player(48, 16, ColorType.MAGENTA);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -36,24 +48,53 @@ public class GameScreen extends GameState {
 	
 	
 	public SpriteSheet tileSets[];
+	public SpriteSheet playerSets[];
 	public TileMap tileMap;
 	public Camera camera;
+	public Player plr1;
+	public Player plr2;
 	
-	public void keyEvent(KeyEvent ev, boolean type)
-	{
-		
+	public void keyPressed(KeyEvent e) {
+		switch(e.getKeyCode()) {
+		case KEY1_LEFT:
+			plr1.walkPressed(false);
+			break;
+		case KEY1_RIGHT:
+			plr1.walkPressed(true);
+			break;
+		case KEY2_LEFT:
+			plr2.walkPressed(false);
+			break;
+		case KEY2_RIGHT:
+			plr2.walkPressed(true);
+			break;
+			
+		case KEY1_BACK:
+			closeState();
+		}
 	}
 	
-	public void keyPressed(KeyEvent ev) {
-		keyEvent(ev, true);
-	}
-	
-	public void keyReleased(KeyEvent ev) {
-		keyEvent(ev, false);
+	public void keyReleased(KeyEvent e) {
+		switch(e.getKeyCode()) {
+		case KEY1_LEFT:
+			plr1.walkStopped(false);
+			break;
+		case KEY1_RIGHT:
+			plr1.walkStopped(true);
+			break;
+		case KEY2_LEFT:
+			plr2.walkStopped(false);
+			break;
+		case KEY2_RIGHT:
+			plr2.walkStopped(true);
+			break;
+		}
 	}
 	
 	public void update(double s)
 	{
+		plr1.update(s);
+		plr2.update(s);
 	}
 	
 	public void draw(Graphics g, int width, int height) {
@@ -72,17 +113,30 @@ public class GameScreen extends GameState {
 		int rightMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxX / TILE_X), tileMap.getWidth() - 1);
 		int topMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxY / TILE_Y), tileMap.getHeight() - 1);
 		
+		Vector bottomLeft;
+		Vector topRight;
+		BufferedImage image;
+		
 		for (int y = bottomMostTileInside; y <= topMostTileInside; ++y) {
 			for (int x = leftMostTileInside; x <= rightMostTileInside; ++x) {
-				Vector bottomLeft = camera.viewToScreen(new Vector(x * TILE_X, y * TILE_Y));
-				Vector topRight = camera.viewToScreen(new Vector((x + 1) * TILE_X, (y + 1) * TILE_Y));
-				
+
 				Tile tile = tileMap.getTile(x, y);
-				BufferedImage image = tileSets[tile.getColor().ordinal()].getImage(tile.getTileX(), tile.getTileY());
+				int ordinal = tile.getColor().ordinal();
+				
+				// Two vectors created per tile every frame?
+				bottomLeft = camera.viewToScreen(new Vector(x * TILE_X, y * TILE_Y));
+				topRight = camera.viewToScreen(new Vector((x + 1) * TILE_X, (y + 1) * TILE_Y));
+				
+				image = tileSets[ordinal].getImage(tile.getTileX(), tile.getTileY());
 				
 				g2d.drawImage(image, (int)bottomLeft.x, (int)bottomLeft.y, (int)topRight.x, (int)topRight.y, 0, 0, TILE_X, TILE_Y, null);
 			}
 		}
+
+		bottomLeft = camera.viewToScreen(plr1.pos);
+		topRight = camera.viewToScreen(new Vector(plr1.pos.x + PLR_X, plr1.pos.y + PLR_Y));
+		image = playerSets[plr1.getColor().ordinal()].getImage(plr1.getAnimX(), plr1.getAnimY());
+		g2d.drawImage(image, (int)bottomLeft.x, (int)topRight.y, (int)topRight.x, (int)bottomLeft.y, 0, 0, TILE_X, TILE_Y, null);
 		
 	}
 	

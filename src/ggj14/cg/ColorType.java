@@ -4,13 +4,15 @@ import java.awt.Color;
 
 public enum ColorType {
 	
+	//Make sure that blank is always first
 	BLANK('X', new Color(0, 0, 0, 0)),
 	RED('R', Color.RED),
-	GREEN('G', Color.GREEN),
-	BLUE('B', Color.BLUE),
 	YELLOW('Y', Color.YELLOW),
-	PURPLE('P', Color.MAGENTA),
-	CYAN('C', Color.CYAN);
+	GREEN('G', Color.GREEN),
+	CYAN('C', Color.CYAN),
+	BLUE('B', Color.BLUE),
+	MAGENTA('M', Color.MAGENTA),
+	WHITE('W', Color.WHITE);
 	
 	private char code;
 	private Color color;
