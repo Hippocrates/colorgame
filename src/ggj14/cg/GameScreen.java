@@ -74,12 +74,13 @@ public class GameScreen extends GameState {
 		
 		for (int y = bottomMostTileInside; y <= topMostTileInside; ++y) {
 			for (int x = leftMostTileInside; x <= rightMostTileInside; ++x) {
-				Vector position = camera.screenToView(new Vector(x * TILE_X, y * TILE_Y));
+				Vector bottomLeft = camera.viewToScreen(new Vector(x * TILE_X, y * TILE_Y));
+				Vector topRight = camera.viewToScreen(new Vector((x + 1) * TILE_X, (y + 1) * TILE_Y));
 				
 				Tile tile = tileMap.getTile(x, y);
-				BufferedImage image = tileSets[tile.getColor().ordinal()].getImage(tile.getType());
+				BufferedImage image = tileSets[tile.getColor().ordinal()].getImage(tile.getTileX(), tile.getTileY());
 				
-				g2d.drawImage(image, (int)position.x, (int)position.y, (int)position.x + TILE_X, (int)position.y + TILE_Y, 0, 0, TILE_X, TILE_Y, null);
+				g2d.drawImage(image, (int)bottomLeft.x, (int)bottomLeft.y, (int)topRight.x, (int)topRight.y, 0, 0, TILE_X, TILE_Y, null);
 			}
 		}
 		
@@ -101,14 +102,15 @@ public class GameScreen extends GameState {
 			for (int y = height - 1; y >= 0; --y) {
 				String line = scanner.nextLine();
 				
-				if (!(line.length() == width*2)) {
+				if (!(line.length() == width*3)) {
 					throw new RuntimeException("Error, tile map line not right size");
 				}
 				
 				for (int x = 0; x < width; ++x) {
-					char code = line.charAt(x*2);
-					int type = line.charAt(x*2 + 1) - 0x30;
-					tileMap.setTile(x,  y,  type, ColorType.fromCode(code));
+					char code = line.charAt(x*3);
+					int tileX = line.charAt(x*3 + 1) - 0x30;
+					int tileY = line.charAt(x*3 + 2) - 0x30;
+					tileMap.setTile(x,  y,  tileX, tileY, ColorType.fromCode(code));
 				}
 			}
 			

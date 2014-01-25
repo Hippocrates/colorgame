@@ -30,6 +30,6 @@ public class Camera {
 		float xRatio = viewSize.x / screenSize.x;
 		float yRatio = viewSize.y / screenSize.y;
 		
-		return new Vector(inPos.x * xRatio, (inPos.y * yRatio)).add(position);
+		return new Vector(inPos.x * xRatio, inPos.y * yRatio).add(position);
 	}
 }

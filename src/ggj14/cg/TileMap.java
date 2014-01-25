@@ -2,7 +2,7 @@ package ggj14.cg;
 
 public class TileMap {
 	
-	private static Tile defaultTile = new Tile(0, ColorType.BLANK);
+	private static Tile defaultTile = new Tile(0, 0, ColorType.BLANK);
 	
 	private int width;
 	private int height;
@@ -26,8 +26,8 @@ public class TileMap {
 		return y*width + x;
 	}
 	
-	public void setTile(int x, int y, int type, ColorType color) {
-		setTile(x, y, new Tile(type, color));
+	public void setTile(int x, int y, int tileX, int tileY, ColorType color) {
+		setTile(x, y, new Tile(tileX, tileY, color));
 	}
 	
 	public void setTile(int x, int y, Tile tile) {
