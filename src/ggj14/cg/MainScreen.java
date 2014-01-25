@@ -1,5 +1,7 @@
 package ggj14.cg;
 
+import ggj14.cg.editor.EditorMainWindow;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -21,6 +23,7 @@ public class MainScreen extends GameState {
 		menu.add(MenuItem.MENU_START);
 		menu.add(MenuItem.MENU_OPTIONS);
 		menu.add(MenuItem.MENU_CREDITS);
+		menu.add(MenuItem.MENU_EDITOR);
 		menu.add(MenuItem.MENU_EXIT);
 		
 		selected = 0;
@@ -76,6 +79,9 @@ public class MainScreen extends GameState {
 			break;
 		case MENU_CREDITS:
 			break;
+		case MENU_EDITOR:
+			new EditorMainWindow();
+			break;
 		case MENU_EXIT:
 			closeState();
 			break;
@@ -86,6 +92,7 @@ public class MainScreen extends GameState {
 		MENU_START("Start Game"),
 		MENU_OPTIONS("Options"),
 		MENU_CREDITS("Credits"),
+		MENU_EDITOR("Editor"),
 		MENU_EXIT("Exit Game");
 		
 		public final String display;

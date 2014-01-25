@@ -16,7 +16,7 @@ public class Player {
 	
 	public void jumpPressed() {
 		if (!isFalling) {
-			yv = 80;
+			yv = 95;
 			isFalling = true;
 		}
 	}
@@ -40,10 +40,10 @@ public class Player {
 	public Vector pos;
 	public float xv;
 	public float yv;
-	public final float maxxv = 32;
-	public final float maxyv = 96;
-	public final float xa = 40;
-	public final float ya = 60;
+	public final float maxxv = 48;
+	public final float maxyv = 128;
+	public final float xa = 80;
+	public final float ya = 80;
 	
 	private ColorType color;
 	private int animX;

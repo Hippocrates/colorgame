@@ -35,7 +35,7 @@ public class GameScreen extends GameState {
 				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
 			}
 			
-			loadMap("res/map/testmap.map");
+			loadMap("res/map/testout.map");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -105,7 +105,7 @@ public class GameScreen extends GameState {
 		if (plr1.isDead || plr2.isDead) {
 			try
 			{
-				loadMap("res/map/testmagenta.map");
+				loadMap("res/map/testout.map");
 			}
 			catch (IOException e) {
 				throw new RuntimeException(e);

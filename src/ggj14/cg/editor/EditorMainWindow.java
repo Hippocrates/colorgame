@@ -86,10 +86,6 @@ public class EditorMainWindow extends JFrame implements KeyListener, MouseListen
 	
 	private EditorOptionsWindow options;
 	private EditorPaletteWindow palette;
-
-	public static void main(String[] args) {
-		new EditorMainWindow();
-	}
 	
 	static {
 		try {
