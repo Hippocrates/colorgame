@@ -106,6 +106,11 @@ public class Player {
 			xv = 0.0f;
 		}
 		
+		if (result.blockTop)
+		{
+			yv = 0.0f;
+		}
+		
 		if (result.killed) {
 			isDead = true;
 		}
