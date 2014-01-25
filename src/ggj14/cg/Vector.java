@@ -21,4 +21,13 @@ public class Vector {
 	public Vector mul(float a) {
 		return new Vector(x * a, y * a);
 	}
+	
+	public float lengthSq() {
+		return x*x + y*y;
+	}
+	
+	public String toString()
+	{
+		return "[" + x + "," + y + "]";
+	}
 }

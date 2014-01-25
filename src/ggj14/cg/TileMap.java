@@ -35,6 +35,9 @@ public class TileMap {
 	}
 	
 	public Tile getTile(int x, int y) {
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return defaultTile;
+		
 		Tile result = tiles[index2d(x, y)];
 		if (result != null) {
 			return result;
@@ -42,5 +45,15 @@ public class TileMap {
 		else {
 			return defaultTile;
 		}
+	}
+	
+	public TileRange getTilesOverlapping(AABBox box, int tileX, int tileY)
+	{
+		int left = (int) Math.max(Math.floor(box.minX / tileX), 0);
+		int bottom = (int) Math.max(Math.floor(box.minY / tileY), 0);
+		int right = (int) Math.min(Math.ceil(box.maxX / tileX) - 1, width - 1);
+		int top = (int) Math.min(Math.ceil(box.maxY / tileY) - 1, height - 1);
+		
+		return new TileRange(left, bottom, right, top);
 	}
 }

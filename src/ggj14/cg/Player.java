@@ -2,11 +2,23 @@ package ggj14.cg;
 
 public class Player {
 	
+	public static final int COLLISION_X_OFFSET = 4;
+	public static final int COLLISION_WIDTH = 8;
+	public static final int COLLISION_Y_OFFSET = 0;
+	public static final int COLLISION_HEIGHT = 16;
+	
 	public boolean isWalking;
 	public boolean isFalling;
 	public boolean facingRight = true;
 	public double animTimer;
 	public final double walkAnimLength = 0.15;
+	
+	public void jumpPressed() {
+		if (!isFalling) {
+			yv = 60;
+			isFalling = true;
+		}
+	}
 	
 	//call when left or right pressed
 	public void walkPressed(boolean isRight) {
@@ -41,7 +53,16 @@ public class Player {
 		this.color = color;
 	}
 	
-	public void update(double s) {
+	public AABBox getCollisionBox()
+	{
+		return new AABBox(pos.x + COLLISION_X_OFFSET, pos.y + COLLISION_Y_OFFSET, pos.x + COLLISION_X_OFFSET + COLLISION_WIDTH, pos.y + COLLISION_Y_OFFSET + COLLISION_HEIGHT);
+	}
+	
+	public void update(double s, TileMap tileMap) {
+		
+		yv -= (ya * s);
+		if (yv > maxyv) { yv = maxyv; }
+		if (yv < -maxyv) { yv = -maxyv; }
 		
 		if(isWalking) {
 			if(facingRight) {
@@ -63,9 +84,26 @@ public class Player {
 			}
 		}
 		
-		pos.x += (xv * s);
-		pos.y += (yv * s);
+		pos.x += Math.max(-0.5, Math.min(0.5, (xv * s)));
+		pos.y += Math.max(-0.5, Math.min(0.5, (yv * s)));
 		
+		CollisionResult result = CollisionOps.collidePlayerToWorld(this, tileMap);
+		
+		if (result.landed)
+		{
+			isFalling = false;
+			yv = 0.0f;
+		}
+		
+		if (yv < 0.0f) {
+			isFalling = true;
+		}
+		
+		if (result.blockLeft || result.blockRight)
+		{
+			xv = 0.0f;
+		}
+
 		//update the player's animation
 		if(isFalling) {
 			animY = 0;
