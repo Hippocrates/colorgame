@@ -93,6 +93,7 @@ public class GameWindow extends JFrame {
 			stateStack.peek().pause();
 		}
 		stateStack.add(state);
+		state.master = this;
 		state.create();
 		state.resume();
 		addKeyListener(state);
@@ -109,6 +110,9 @@ public class GameWindow extends JFrame {
 		
 		if(stateStack.isEmpty()) {
 			//TODO Clean up the game
+			dispose();
+			//WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+            //Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 		} else {
 			stateStack.peek().resume();
 		}
