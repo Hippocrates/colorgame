@@ -35,7 +35,7 @@ public class GameScreen extends GameState {
 				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
 			}
 			
-			loadMap("res/map/testout.map");
+			loadMap("res/map/testmap.map");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -97,8 +97,48 @@ public class GameScreen extends GameState {
 	
 	public void update(double s)
 	{
-		plr1.update(s, tileMap);
-		plr2.update(s, tileMap);
+		plr1.update(s, tileMap, camera);
+
+		plr2.update(s, tileMap, camera);
+		
+		// re-start level
+		if (plr1.isDead || plr2.isDead) {
+			try
+			{
+				loadMap("res/map/testmagenta.map");
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		Vector plr1CamTarget = plr1.getCameraTarget();
+		Vector plr2CamTarget = plr2.getCameraTarget();
+		
+		Vector cameraTarget = plr1CamTarget.add(plr2CamTarget).mul(0.5f).sub(camera.viewSize.mul(0.5f));
+		cameraTarget.y = 0.0f;
+		
+		Vector cameraDelta = cameraTarget.sub(camera.position);
+		
+		float hardConstraintLeft = Math.min(plr1.pos.x, plr2.pos.x);
+		float hardConstraintRight = Math.max(plr1.pos.x + PLR_X, plr2.pos.x + PLR_X);
+		
+		if (cameraDelta.length() > 1.0) {
+			
+			if (cameraDelta.length() > 2.0f) {
+				cameraDelta = cameraDelta.scale(2.0f);
+			}
+			
+			camera.position = camera.position.add(cameraDelta);
+			/*
+			if (camera.position.x < hardConstraintLeft) {
+				camera.position.x = hardConstraintLeft;
+			}
+			
+			if (camera.position.x > hardConstraintRight) {
+				camera.position.x = hardConstraintRight;
+			}*/
+		}
 	}
 	
 	public void draw(Graphics g, int width, int height) {
@@ -170,6 +210,8 @@ public class GameScreen extends GameState {
 			
 			for (int y = height - 1; y >= 0; --y) {
 				String line = scanner.nextLine();
+				
+				System.out.println(line.length());
 				
 				if (!(line.length() == width*3)) {
 					throw new RuntimeException("Error, tile map line not right size");

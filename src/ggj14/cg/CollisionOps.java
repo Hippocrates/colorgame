@@ -2,7 +2,7 @@ package ggj14.cg;
 
 public final class CollisionOps {
 	
-	public static CollisionResult collidePlayerToWorld(Player p, TileMap map)
+	public static CollisionResult collidePlayerToWorld(Player p, TileMap map, Camera camera)
 	{
 		CollisionResult results = new CollisionResult();
 		AABBox playerBox = p.getCollisionBox();
@@ -14,7 +14,8 @@ public final class CollisionOps {
 				Vector resolution = new Vector(0.0f, 0.0f);
 				playerBox = p.getCollisionBox();
 				
-				if (tile.getColor() != ColorType.BLANK) {
+				switch (p.getColor().getCollisionType(tile.getColor())) {
+				case SOLID:
 					float rightSide = ((x+1)*GameScreen.TILE_X);
 					float leftSide = x*GameScreen.TILE_X;
 					float topSide = ((y+1)*GameScreen.TILE_Y);
@@ -30,10 +31,10 @@ public final class CollisionOps {
 					overlaps[2] = playerBox.minY < topSide && playerBox.maxY > topSide;
 					overlaps[3] = playerBox.maxY > bottomSide && playerBox.minY < bottomSide;
 					
-					solid[0] = map.getTile(x + 1, y).getColor() != ColorType.BLANK;
-					solid[1] = map.getTile(x - 1, y).getColor() != ColorType.BLANK;
-					solid[2] = map.getTile(x, y + 1).getColor() != ColorType.BLANK;
-					solid[3] = map.getTile(x, y - 1).getColor() != ColorType.BLANK;
+					solid[0] = p.getColor().getCollisionType(map.getTile(x + 1, y).getColor()) == CollisionType.SOLID;
+					solid[1] = p.getColor().getCollisionType(map.getTile(x - 1, y).getColor()) == CollisionType.SOLID;
+					solid[2] = p.getColor().getCollisionType(map.getTile(x, y + 1).getColor()) == CollisionType.SOLID;
+					solid[3] = p.getColor().getCollisionType(map.getTile(x, y - 1).getColor()) == CollisionType.SOLID;
 					
 					delta[0] = new Vector(rightSide - playerBox.minX, 0.0f);
 					delta[1] = new Vector(leftSide - playerBox.maxX, 0.0f);
@@ -56,33 +57,53 @@ public final class CollisionOps {
 						
 						absDelta[curMin] = Float.MAX_VALUE;
 					}
-				}
-				
-				if (resolution.lengthSq() > 0)
-				{
-					p.pos = p.pos.add(resolution);
 					
-					if (resolution.y > 0)
+					if (resolution.lengthSq() > 0)
 					{
-						results.landed = true;
+						p.pos = p.pos.add(resolution);
+						
+						if (resolution.y > 0)
+						{
+							results.landed = true;
+						}
+						if (resolution.x > 0)
+						{
+							results.blockLeft = true;
+						}
+						if (resolution.x < 0)
+						{
+							results.blockRight = true;
+						}
+						if (resolution.y < 0)
+						{
+							results.blockTop = true;
+						}
 					}
-					if (resolution.x > 0)
-					{
-						results.blockLeft = true;
-					}
-					if (resolution.x < 0)
-					{
-						results.blockRight = true;
-					}
-					if (resolution.y < 0)
-					{
-						results.blockTop = true;
-					}
+					break;
+				case DEATH:
+					results.killed = true;
+					break;
+				case NOTHING:
+					break;
 				}
 			}
 		}
 		
+		AABBox cameraBox = camera.getViewBounds();
+		playerBox = p.getCollisionBox();
+		
+		if (cameraBox.maxX < playerBox.maxX)
+		{
+			results.blockRight = true;
+			p.pos.x += (cameraBox.maxX - playerBox.maxX);
+		}
+		
+		if (cameraBox.minX > playerBox.minX)
+		{
+			results.blockLeft = true;
+			p.pos.x += (cameraBox.minX - playerBox.minX);
+		}
+
 		return results;
 	}
-	
 }

@@ -26,6 +26,20 @@ public class Vector {
 		return x*x + y*y;
 	}
 	
+	public float length() {
+		return (float) Math.sqrt(lengthSq());
+	}
+	
+	public Vector scale(float length) {
+		float curLength = length();
+		
+		if (curLength > 0.0f) {
+			return this.mul(length / curLength);
+		}
+		
+		return this;
+	}
+	
 	public String toString()
 	{
 		return "[" + x + "," + y + "]";

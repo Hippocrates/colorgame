@@ -7,6 +7,7 @@ public class Player {
 	public static final int COLLISION_Y_OFFSET = 0;
 	public static final int COLLISION_HEIGHT = 16;
 	
+	public boolean isDead = false;
 	public boolean isWalking;
 	public boolean isFalling;
 	public boolean facingRight = true;
@@ -15,7 +16,7 @@ public class Player {
 	
 	public void jumpPressed() {
 		if (!isFalling) {
-			yv = 60;
+			yv = 120;
 			isFalling = true;
 		}
 	}
@@ -40,9 +41,9 @@ public class Player {
 	public float xv;
 	public float yv;
 	public final float maxxv = 32;
-	public final float maxyv = 48;
+	public final float maxyv = 100;
 	public final float xa = 32;
-	public final float ya = 32;
+	public final float ya = 48;
 	
 	private ColorType color;
 	private int animX;
@@ -57,8 +58,8 @@ public class Player {
 	{
 		return new AABBox(pos.x + COLLISION_X_OFFSET, pos.y + COLLISION_Y_OFFSET, pos.x + COLLISION_X_OFFSET + COLLISION_WIDTH, pos.y + COLLISION_Y_OFFSET + COLLISION_HEIGHT);
 	}
-	
-	public void update(double s, TileMap tileMap) {
+
+	public void update(double s, TileMap tileMap, Camera camera) {
 		
 		yv -= (ya * s);
 		if (yv > maxyv) { yv = maxyv; }
@@ -84,10 +85,10 @@ public class Player {
 			}
 		}
 		
-		pos.x += Math.max(-0.5, Math.min(0.5, (xv * s)));
-		pos.y += Math.max(-0.5, Math.min(0.5, (yv * s)));
+		pos.x += (xv * s);
+		pos.y += (yv * s);
 		
-		CollisionResult result = CollisionOps.collidePlayerToWorld(this, tileMap);
+		CollisionResult result = CollisionOps.collidePlayerToWorld(this, tileMap, camera);
 		
 		if (result.landed)
 		{
@@ -102,6 +103,10 @@ public class Player {
 		if (result.blockLeft || result.blockRight)
 		{
 			xv = 0.0f;
+		}
+		
+		if (result.killed) {
+			isDead = true;
 		}
 
 		//update the player's animation
@@ -123,6 +128,14 @@ public class Player {
 			animY = 1;
 			animX = 0;
 		}
+	}
+	
+	public Vector getCenter() {
+		return getCollisionBox().getCenter();
+	}
+	
+	public Vector getCameraTarget() {
+		return getCenter().add(new Vector((facingRight ? 1.0f : -1.0f) * 32.0f, 0.0f));
 	}
 	
 	public ColorType getColor() {
