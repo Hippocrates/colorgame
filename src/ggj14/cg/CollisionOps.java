@@ -8,8 +8,8 @@ public final class CollisionOps {
 		AABBox playerBox = p.getCollisionBox();
 		TileRange range = map.getTilesOverlapping(playerBox, GameScreen.TILE_X, GameScreen.TILE_Y);
 		
-		for (int y = range.bottom - 1; y <= range.top + 1; ++y) {
-			for (int x = range.left - 1; x <= range.right + 1; ++x) {
+		for (int y = range.bottom; y <= range.top; ++y) {
+			for (int x = range.left; x <= range.right; ++x) {
 				Tile tile = map.getTile(x, y);
 				Vector resolution = new Vector(0.0f, 0.0f);
 				playerBox = p.getCollisionBox();
@@ -22,7 +22,7 @@ public final class CollisionOps {
 					
 					boolean overlaps[] = new boolean[4];
 					boolean solid[] = new boolean[4];
-					float delta[] = new float[4];
+					Vector delta[] = new Vector[4];
 					float absDelta[] = new float[4];
 
 					overlaps[0] = playerBox.minX < rightSide && playerBox.maxX > rightSide;
@@ -35,14 +35,14 @@ public final class CollisionOps {
 					solid[2] = map.getTile(x, y + 1).getColor() != ColorType.BLANK;
 					solid[3] = map.getTile(x, y - 1).getColor() != ColorType.BLANK;
 					
-					delta[0] = rightSide - playerBox.minX;
-					delta[1] = leftSide - playerBox.maxX;
-					delta[2] = topSide - playerBox.minY;
-					delta[3] = bottomSide - playerBox.maxY;
+					delta[0] = new Vector(rightSide - playerBox.minX, 0.0f);
+					delta[1] = new Vector(leftSide - playerBox.maxX, 0.0f);
+					delta[2] = new Vector(0.0f, topSide - playerBox.minY);
+					delta[3] = new Vector(0.0f, bottomSide - playerBox.maxY);
 		
 					for (int i = 0; i < 4; ++i)
 					{
-						absDelta[i] = Math.abs(delta[i]);
+						absDelta[i] = delta[i].lengthSq();
 					}
 					
 					for (int i = 0; i < 4; ++i)
@@ -50,12 +50,8 @@ public final class CollisionOps {
 						int curMin = Util.min(absDelta);
 						
 						if (overlaps[curMin] && !solid[curMin]) {
-							if (curMin < 2) {
-								resolution.x += delta[curMin];
-							}
-							else {
-								resolution.y += delta[curMin];
-							}
+							resolution = resolution.add(delta[curMin]);
+							break;
 						}
 						
 						absDelta[curMin] = Float.MAX_VALUE;
