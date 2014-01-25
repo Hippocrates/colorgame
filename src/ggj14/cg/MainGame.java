@@ -6,6 +6,8 @@ public class MainGame {
 		// TODO Auto-generated method stub
 
 		new GameWindow();
+		
+		
 	}
 
 }
