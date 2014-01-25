@@ -60,11 +60,17 @@ public class GameScreen extends GameState {
 		case KEY1_RIGHT:
 			plr1.walkPressed(true);
 			break;
+		case KEY1_UP:
+			plr1.jumpPressed();
+			break;
 		case KEY2_LEFT:
 			plr2.walkPressed(false);
 			break;
 		case KEY2_RIGHT:
 			plr2.walkPressed(true);
+			break;
+		case KEY2_UP:
+			plr2.jumpPressed();
 			break;
 			
 		case KEY1_BACK:
@@ -91,8 +97,8 @@ public class GameScreen extends GameState {
 	
 	public void update(double s)
 	{
-		plr1.update(s);
-		plr2.update(s);
+		plr1.update(s, tileMap);
+		plr2.update(s, tileMap);
 	}
 	
 	public void draw(Graphics g, int width, int height) {
@@ -106,17 +112,15 @@ public class GameScreen extends GameState {
 		
 		AABBox cameraBounds = camera.getViewBounds();
 		
-		int leftMostTileInside = (int) Math.max(Math.floor(cameraBounds.minX / TILE_X), 0);
-		int bottomMostTileInside = (int) Math.max(Math.floor(cameraBounds.minY / TILE_Y), 0);
-		int rightMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxX / TILE_X), tileMap.getWidth() - 1);
-		int topMostTileInside = (int) Math.min(Math.ceil(cameraBounds.maxY / TILE_Y), tileMap.getHeight() - 1);
+		TileRange range = tileMap.getTilesOverlapping(cameraBounds, TILE_X, TILE_Y);
+		
 		
 		Vector bottomLeft;
 		Vector topRight;
 		BufferedImage image;
 		
-		for (int y = bottomMostTileInside; y <= topMostTileInside; ++y) {
-			for (int x = leftMostTileInside; x <= rightMostTileInside; ++x) {
+		for (int y = range.bottom; y <= range.top; ++y) {
+			for (int x = range.left; x <= range.right; ++x) {
 
 				Tile tile = tileMap.getTile(x, y);
 				int ordinal = tile.getColor().ordinal();

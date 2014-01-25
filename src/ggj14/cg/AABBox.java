@@ -33,10 +33,18 @@ public class AABBox {
 	}
 	
 	public boolean overlaps(AABBox other) {
-		return minX <= other.maxX && minY <= other.maxY && maxX >= other.minY && maxY >= other.maxY;
+		return minX < other.maxX && minY < other.maxY && maxX > other.minX && maxY > other.minY;
 	}
 	
 	public boolean contains(AABBox other) {
 		return contains(other.getMin()) && contains(other.getMax());
+	}
+	
+	public AABBox translated(Vector delta) {
+		return new AABBox(minX + delta.x, minY + delta.y, maxX + delta.x, maxY + delta.y);
+	}
+	
+	public Vector getCenter() {
+		return new Vector((minX + maxX) / 2, (minY + maxY) / 2);
 	}
 }
