@@ -30,7 +30,7 @@ public class GameScreen extends GameState {
 	public String levelStr;
 	
 	public boolean outOfMaps = false;
-	public int currentMap = 3;
+	public int currentMap = 0;
 	
 	public GameScreen()
 	{
