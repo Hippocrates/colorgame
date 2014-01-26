@@ -9,14 +9,17 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class MainScreen extends GameState {
-	
+
+	public static final Font TITLE_FONT = new Font(Font.MONOSPACED, Font.BOLD, 48);
 	public static final Font MENU_FONT = new Font(Font.MONOSPACED, Font.BOLD, 24);
 	
 	public ArrayList<MenuItem> menu;
 	public int selected;
 	public MenuItem selectedItem;
 	
-	public double elapsed = 0;
+	public double animTimer = 0;
+	public final double animLength = 0.75;
+	public int colorIndex = 1;
 	
 	public MainScreen() {
 		menu = new ArrayList<MenuItem>();
@@ -30,17 +33,34 @@ public class MainScreen extends GameState {
 		selectedItem = menu.get(0);
 	}
 	
+	public void update(double s) {
+		animTimer += s;
+		if(animTimer > animLength) {
+			animTimer -= animLength;
+			colorIndex++;
+			if(colorIndex >= ColorType.size() - 1) {
+				colorIndex = 1;
+			}
+		}
+	}
+	
 	public void draw(Graphics g) {
-		g.setFont(MENU_FONT);
+		g.setFont(TITLE_FONT);
+		g.setColor(ColorType.fromId(colorIndex).getColor());
+		g.drawString("Chromaticaste", 30, 75);
 		
+		g.setFont(MENU_FONT);
 		int i = 0;
+		int xPlus;
 		for(MenuItem item : menu) {
+			xPlus = 0;
 			g.setColor(Color.RED);
 			if(item == selectedItem) {
+				xPlus = 14;
 				g.setColor(Color.GREEN);
 			}
 			
-			g.drawString(item.display, 30, 45 + 30 * i);
+			g.drawString(item.display, 30 + xPlus, 135 + 30 * i);
 			i++;
 		}
 	}

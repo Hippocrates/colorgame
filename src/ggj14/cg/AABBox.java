@@ -47,4 +47,11 @@ public class AABBox {
 	public Vector getCenter() {
 		return new Vector((minX + maxX) / 2, (minY + maxY) / 2);
 	}
+	
+	public void set(float _minX, float _minY, float _maxX, float _maxY) {
+		minX = _minX;
+		minY = _minY;
+		maxX = _maxX;
+		maxY = _maxY;
+	}
 }

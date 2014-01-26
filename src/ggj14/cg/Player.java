@@ -15,7 +15,10 @@ public class Player implements Drawable {
 	public boolean isFalling;
 	public boolean facingRight = true;
 	public double animTimer;
+	public double transitionTimer;
 	public final double walkAnimLength = 0.15;
+	public final double lookAnimLength = 1.20;
+	public final double blinkAnimLength = 0.20;
 	
 	public void jumpPressed() {
 		if (!isFalling) {
@@ -31,6 +34,8 @@ public class Player implements Drawable {
 		isWalking = true;
 		facingRight = isRight;
 		animTimer = 0;
+		animX = 0;
+		animY = 0;
 	}
 	
 	//cal when left or right depressed
@@ -38,10 +43,15 @@ public class Player implements Drawable {
 		if(facingRight != isRight) {return;}
 		
 		isWalking = false;
+		setTransitionTimer();
+		animTimer = 0;
+		animX = 0;
+		animY = 1;
 	}
 	
 	public Vector pos;
 	public Vector pos2;
+	public AABBox collision;
 	public float xv;
 	public float yv;
 
@@ -57,12 +67,14 @@ public class Player implements Drawable {
 	public Player(float x, float y, ColorType color) {
 		pos = new Vector(x, y);
 		pos2 = new Vector(x + PLR_X, y + PLR_Y);
+		collision = new AABBox(pos.x + COLLISION_X_OFFSET, pos.y + COLLISION_Y_OFFSET, pos.x + COLLISION_X_OFFSET + COLLISION_WIDTH, pos.y + COLLISION_Y_OFFSET + COLLISION_HEIGHT);
 		this.color = color;
+		setTransitionTimer(); //so players don't start looking immediately
 	}
 	
 	public AABBox getCollisionBox()
 	{
-		return new AABBox(pos.x + COLLISION_X_OFFSET, pos.y + COLLISION_Y_OFFSET, pos.x + COLLISION_X_OFFSET + COLLISION_WIDTH, pos.y + COLLISION_Y_OFFSET + COLLISION_HEIGHT);
+		return collision;
 	}
 
 	public void update(double s, TileMap tileMap, Camera camera) {
@@ -93,6 +105,7 @@ public class Player implements Drawable {
 		
 		pos.x += (xv * s);
 		pos.y += (yv * s);
+		collision.set(pos.x + COLLISION_X_OFFSET, pos.y + COLLISION_Y_OFFSET, pos.x + COLLISION_X_OFFSET + COLLISION_WIDTH, pos.y + COLLISION_Y_OFFSET + COLLISION_HEIGHT);
 		
 		CollisionResult result = CollisionOps.collidePlayerToWorld(this, tileMap, camera);
 		
@@ -100,6 +113,8 @@ public class Player implements Drawable {
 		{
 			isFalling = false;
 			yv = 0.0f;
+			animX = 0;
+			animY = 1;
 		}
 		
 		if (yv < 0.0f) {
@@ -138,9 +153,29 @@ public class Player implements Drawable {
 			animY = 0;
 			animX = (int) Math.floor(animTimer / walkAnimLength);
 		} else {
+			animTimer += s;
 			animY = 1;
-			animX = 0;
+			//if standing, switch to a random animation when done
+			if(animX == 0) {
+				if(animTimer >= transitionTimer) {
+					animTimer = 0;
+					animX = (int) Math.floor(Math.random() * 3) + 1;
+				}
+				//otherwise switch to standing when this animation is done
+			} else {
+				if((animX == 1 && animTimer >= blinkAnimLength) || animTimer >= lookAnimLength) {
+					animTimer = 0;
+					animX = 0;
+					setTransitionTimer();
+				}
+			}
 		}
+	}
+	
+	//sets the transition timer to a random number between 3 and 5
+	//players will wait that long before transitioning to a random idle animation
+	private void setTransitionTimer() {
+		transitionTimer = 3 + Math.random() * 2;
 	}
 	
 	public Vector getCenter() {

@@ -22,32 +22,22 @@ public class GameScreen extends GameState {
 
 	public static final int LEVER_X = 16;
 	public static final int LEVER_Y = 16;
+
+	public static final int FLAG_X = 16;
+	public static final int FLAG_Y = 16;
 	
-	public String level = "res/map/testlever.map";
+	public String levelStr = "res/map/testflag.map";
 	
 	public GameScreen()
 	{
 		try {
-			BufferedImage originalImage = ImageIO.read(new File("res/img/tilesheet.png"));
-			System.out.println(originalImage.getType());
-			tileSets = new SpriteSheet[ColorType.size()];
-			for (ColorType c : ColorType.values()) {
-				tileSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), TILE_X, TILE_Y);
-			}
 			
-			originalImage = ImageIO.read(new File("res/img/playeranim.png"));
-			playerSets = new SpriteSheet[ColorType.size()];
-			for (ColorType c : ColorType.values()) {
-				playerSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), PLR_X, PLR_Y);
-			}
-			
-			originalImage = ImageIO.read(new File("res/img/lever.png"));
-			leverSets = new SpriteSheet[ColorType.size()];
-			for (ColorType c : ColorType.values()) {
-				leverSets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), LEVER_X, LEVER_Y);
-			}
+			tileSets = loadSpriteSheets("res/img/tilesheet.png", TILE_X, TILE_Y);
+			playerSets = loadSpriteSheets("res/img/playeranim.png", PLR_X, PLR_Y);
+			leverSets = loadSpriteSheets("res/img/lever.png", PLR_X, PLR_Y);
+			flagSets = loadSpriteSheets("res/img/flag.png", PLR_X, PLR_Y);
 
-			loadMap(level);
+			loadMap(levelStr);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -56,16 +46,27 @@ public class GameScreen extends GameState {
 		}
 	}
 	
+	private static SpriteSheet[] loadSpriteSheets(String filename, int imgX, int imgY) throws IOException {
+		BufferedImage originalImage = ImageIO.read(new File(filename));
+		SpriteSheet[] sheets = new SpriteSheet[ColorType.size()];
+		for (ColorType c : ColorType.values()) {
+			sheets[c.ordinal()] = new SpriteSheet(ImageOps.makeColouredImage(originalImage, c.getColor()), imgX, imgY);
+		}
+		return sheets;
+	}
+	
 	
 	public SpriteSheet tileSets[];
 	public SpriteSheet playerSets[];
 	public SpriteSheet leverSets[];
+	public SpriteSheet flagSets[];
 	public TileMap tileMap;
 	public Camera camera;
 	public Player plr1;
 	public Player plr2;
 	
 	public ArrayList<Lever> levers;
+	public ArrayList<Flag> flags;
 	
 	//keep these cached so that if down is held, we don't keep checking for lever press
 	private boolean p1lever = false;
@@ -147,15 +148,25 @@ public class GameScreen extends GameState {
 	
 	public void update(double s)
 	{
+		for(Lever lever : levers) {
+			lever.update(s); //Levers only animate during update
+		}
+		for(Flag flag : flags) {
+			flag.update(s); //Levers only animate during update
+		}
+		
 		plr1.update(s, tileMap, camera);
 
 		plr2.update(s, tileMap, camera);
+
+		collidePlayerWithObjects(plr1);
+		collidePlayerWithObjects(plr2);
 		
 		// re-start level
 		if (plr1.isDead || plr2.isDead) {
 			try
 			{
-				loadMap(level);
+				loadMap(levelStr);
 			}
 			catch (IOException e) {
 				throw new RuntimeException(e);
@@ -163,6 +174,36 @@ public class GameScreen extends GameState {
 		}
 		
 		scrollCamera();
+	}
+	
+	//A simple collision detection for players activating flags and being killed by objects
+	private void collidePlayerWithObjects(Player player) {
+		if(player.getColor().getCollisionType(plr1.getColor()) == CollisionType.DEATH &&
+				player.getCollisionBox().overlaps(plr1.getCollisionBox())) {
+			player.isDead = true;
+		}
+		if(player.getColor().getCollisionType(plr2.getColor()) == CollisionType.DEATH &&
+				player.getCollisionBox().overlaps(plr2.getCollisionBox())) {
+			player.isDead = true;
+		}
+		
+		for(Lever lever : levers) {
+			if(player.getColor().getCollisionType(lever.getColor()) == CollisionType.DEATH &&
+					player.getCollisionBox().overlaps(lever.getCollisionBox())) {
+				player.isDead = true;
+			}
+		}
+		
+		for(Flag flag : flags) {
+			if(player.getColor().getCollisionType(flag.getColor()) == CollisionType.DEATH &&
+					player.getCollisionBox().overlaps(flag.getCollisionBox())) {
+				player.isDead = true;
+			}
+			if(!flag.isActive && player.getColor().getCollisionType(flag.getColor()) == CollisionType.SOLID &&
+					player.getCollisionBox().overlaps(flag.getCollisionBox())) {
+				flag.activate(tileMap);
+			}
+		}
 	}
 	
 	public void scrollCamera() {
@@ -249,9 +290,12 @@ public class GameScreen extends GameState {
 
 		cameraDraw(playerSets, plr1, g2d, plr1.getPos(), plr1.getPos2());
 		cameraDraw(playerSets, plr2, g2d, plr2.getPos(), plr2.getPos2());
-		
+
 		for(Lever lever : levers) {
 			cameraDraw(leverSets, lever, g2d, lever.getPos(), lever.getPos2());
+		}
+		for(Flag flag : flags) {
+			cameraDraw(flagSets, flag, g2d, flag.getPos(), flag.getPos2());
 		}
 		
 	}
@@ -268,8 +312,9 @@ public class GameScreen extends GameState {
 	}
 	
 	public void loadMap(String filename) throws IOException {
-		
+
 		levers = new ArrayList<Lever>();
+		flags = new ArrayList<Flag>();
 		
 		Scanner scanner = new Scanner(new FileReader(filename));
 		
@@ -316,6 +361,9 @@ public class GameScreen extends GameState {
 		}
 		else if (command.equalsIgnoreCase("LEVER")) {
 			levers.add(Lever.inputLeverFromFile(scanner));
+		}
+		else if (command.equalsIgnoreCase("FLAG")) {
+			flags.add(Flag.inputLeverFromFile(scanner));
 		}
 	}
 }
