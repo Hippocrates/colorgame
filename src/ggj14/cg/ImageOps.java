@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 public final class ImageOps {
 	public static BufferedImage makeColouredImage(BufferedImage input, Color targetColor) {
 		
-		BufferedImage copy = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
+		BufferedImage copy = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		
 		for (int y = 0; y < input.getHeight(); ++y) {
 			for (int x = 0; x < input.getWidth(); ++x) {

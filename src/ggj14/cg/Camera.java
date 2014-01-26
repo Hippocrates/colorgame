@@ -20,10 +20,10 @@ public class Camera {
 	public Vector viewToScreen(Vector inPos) {
 		Vector raw = inPos.sub(position);
 		
-		float xRatio = screenSize.x / viewSize.x;
-		float yRatio = screenSize.y / viewSize.y;
+		raw.x *= screenSize.x / viewSize.x;
+		raw.y *= screenSize.y / viewSize.y;
 		
-		return new Vector(raw.x * xRatio, raw.y * yRatio);
+		return raw;
 	}
 	
 	public Vector screenToView(Vector inPos) {

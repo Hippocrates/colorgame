@@ -1,11 +1,14 @@
 package ggj14.cg;
 
-public class Player {
+public class Player implements Drawable {
 	
-	public static final int COLLISION_X_OFFSET = 4;
-	public static final int COLLISION_WIDTH = 8;
+	public static final int COLLISION_X_OFFSET = 5;
+	public static final int COLLISION_WIDTH = 6;
 	public static final int COLLISION_Y_OFFSET = 0;
 	public static final int COLLISION_HEIGHT = 16;
+
+	public static final int PLR_X = GameScreen.PLR_X;
+	public static final int PLR_Y = GameScreen.PLR_Y;
 	
 	public boolean isDead = false;
 	public boolean isWalking;
@@ -38,6 +41,7 @@ public class Player {
 	}
 	
 	public Vector pos;
+	public Vector pos2;
 	public float xv;
 	public float yv;
 
@@ -52,6 +56,7 @@ public class Player {
 	
 	public Player(float x, float y, ColorType color) {
 		pos = new Vector(x, y);
+		pos2 = new Vector(x + PLR_X, y + PLR_Y);
 		this.color = color;
 	}
 	
@@ -114,6 +119,8 @@ public class Player {
 		if (result.killed) {
 			isDead = true;
 		}
+		
+		pos2.set(pos.x + PLR_X, pos.y + PLR_Y);
 
 		//update the player's animation
 		if(isFalling) {
@@ -140,16 +147,28 @@ public class Player {
 		return getCollisionBox().getCenter();
 	}
 	
+	public Vector getPos() {
+		return pos;
+	}
+	
+	public Vector getPos2() {
+		return pos2;
+	}
+	
+	public int getTileX() {
+		return animX;
+	}
+	
+	public int getTileY() {
+		return animY;
+	}
+	
 	public ColorType getColor() {
 		return color;
 	}
 	
-	public int getAnimX() {
-		return animX;
-	}
-	
-	public int getAnimY() {
-		return animY;
+	public boolean drawFlipped() {
+		return !facingRight;
 	}
 	
 }

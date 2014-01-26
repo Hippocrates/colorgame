@@ -34,17 +34,17 @@ public enum ColorType {
 		
 		int numNormals = size() - 2;
 		
-		for (int i = 0; i < size() - 2; ++i)
+		for (int i = 1; i < size() - 1; ++i)
 		{
-			collisionMatrix[i+1][0] = CollisionType.NOTHING;
-			collisionMatrix[i+1][size()-1] = CollisionType.SOLID;
+			collisionMatrix[i][0] = CollisionType.NOTHING;
+			collisionMatrix[i][size()-1] = CollisionType.SOLID;
 			
-			collisionMatrix[i+1][i+1] = CollisionType.SOLID;
-			collisionMatrix[i+1][(i+1) % numNormals + 1] = CollisionType.SOLID;
-			collisionMatrix[i+1][(i+2) % numNormals + 1] = CollisionType.NOTHING;
-			collisionMatrix[i+1][(i+3) % numNormals + 1] = CollisionType.DEATH;
-			collisionMatrix[i+1][(i+4) % numNormals + 1] = CollisionType.NOTHING;
-			collisionMatrix[i+1][(i+5) % numNormals + 1] = CollisionType.SOLID;
+			collisionMatrix[i][i] = CollisionType.SOLID;
+			collisionMatrix[i][(i) % numNormals + 1] = CollisionType.SOLID;
+			collisionMatrix[i][(i+1) % numNormals + 1] = CollisionType.NOTHING;
+			collisionMatrix[i][(i+2) % numNormals + 1] = CollisionType.DEATH;
+			collisionMatrix[i][(i+3) % numNormals + 1] = CollisionType.NOTHING;
+			collisionMatrix[i][(i+4) % numNormals + 1] = CollisionType.SOLID;
 		}
 	}
 

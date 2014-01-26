@@ -1,6 +1,8 @@
 package ggj14.cg;
 
-public class Tile {
+public class Tile implements Drawable {
+	private Vector pos;
+	private Vector pos2;
 	private int tileX;
 	private int tileY;
 	private ColorType color;
@@ -9,6 +11,14 @@ public class Tile {
 		tileX = _tileX;
 		tileY = _tileY;
 		color = _color;
+	}
+	
+	public Vector getBottomLeft() {
+		return pos;
+	}
+	
+	public Vector getTopRight() {
+		return pos2;
 	}
 	
 	public int getTileX() {
@@ -21,5 +31,9 @@ public class Tile {
 	
 	public ColorType getColor() {
 		return color;
+	}
+	
+	public boolean drawFlipped() {
+		return false;
 	}
 }

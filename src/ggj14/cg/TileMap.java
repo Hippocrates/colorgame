@@ -1,5 +1,8 @@
 package ggj14.cg;
 
+import java.io.IOException;
+import java.util.Scanner;
+
 public class TileMap {
 	
 	private static Tile defaultTile = new Tile(0, 0, ColorType.BLANK);
@@ -14,6 +17,36 @@ public class TileMap {
 	
 	public int getHeight() {
 		return height;
+	}
+	
+	public static TileMap inputMapFromFile(Scanner scanner) throws IOException {
+		
+		int width = scanner.nextInt();
+		int height = scanner.nextInt();
+		
+		// read to EOL first
+		scanner.nextLine();
+		
+		TileMap tileMap = new TileMap(width, height);
+		
+		for (int y = height - 1; y >= 0; --y) {
+			String line = scanner.nextLine();
+			
+			System.out.println(line.length());
+			
+			if (!(line.length() == width*3)) {
+				throw new RuntimeException("Error, tile map line not right size");
+			}
+			
+			for (int x = 0; x < width; ++x) {
+				char code = line.charAt(x*3);
+				int tileY = line.charAt(x*3 + 1) - 0x30;
+				int tileX = line.charAt(x*3 + 2) - 0x30;
+				tileMap.setTile(x,  y,  tileX, tileY, ColorType.fromCode(code));
+			}
+		}
+		
+		return tileMap;
 	}
 
 	public TileMap(int _width, int _height) {

@@ -44,4 +44,9 @@ public class Vector {
 	{
 		return "[" + x + "," + y + "]";
 	}
+	
+	public void set(float _x, float _y) {
+		x = _x;
+		y = _y;
+	}
 }
