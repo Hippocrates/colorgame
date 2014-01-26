@@ -95,7 +95,7 @@ public class Player implements Drawable {
 		
 		if(!isDead) {
 			
-			if(isWalking && !hasWon) {
+			if(isWalking && !hasWon && !hasLost) {
 				if(facingRight) {
 					xv += (xa * s);
 					if(xv > maxxv) {xv = maxxv;}
@@ -144,11 +144,8 @@ public class Player implements Drawable {
 				yv = 0.0f;
 			}
 			
-			if (result.killed) {
-				isDead = true;
-				yv = maxyv;
-				if(xv > 0) {xv = -maxxv;}
-				else {xv = maxxv;}
+			if (result.killed || pos.y < 0) {
+				killPlayer();
 			}
 		}
 		
@@ -216,6 +213,15 @@ public class Player implements Drawable {
 			if(animX > 3) {animX = 0;} //to fix disapperaing player bug
 		}
 		fallDur += s;
+	}
+	
+	public void killPlayer() {
+		if(!isDead) {
+			isDead = true;
+			yv = maxyv;
+			if(xv > 0) {xv = -maxxv;}
+			else {xv = maxxv;}
+		}
 	}
 	
 	//sets the transition timer to a random number between 3 and 5

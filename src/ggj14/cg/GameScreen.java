@@ -30,7 +30,7 @@ public class GameScreen extends GameState {
 	public String levelStr;
 	
 	public boolean outOfMaps = false;
-	public int currentMap = 0;
+	public int currentMap = 3;
 	
 	public GameScreen()
 	{
@@ -219,24 +219,24 @@ public class GameScreen extends GameState {
 	private void collidePlayerWithObjects(Player player) {
 		if(player.getColor().getCollisionType(plr1.getColor()) == CollisionType.DEATH &&
 				player.getCollisionBox().overlaps(plr1.getCollisionBox())) {
-			player.isDead = true;
+			player.killPlayer();
 		}
 		if(player.getColor().getCollisionType(plr2.getColor()) == CollisionType.DEATH &&
 				player.getCollisionBox().overlaps(plr2.getCollisionBox())) {
-			player.isDead = true;
+			player.killPlayer();
 		}
 		
 		for(Lever lever : levers) {
 			if(player.getColor().getCollisionType(lever.getColor()) == CollisionType.DEATH &&
 					player.getCollisionBox().overlaps(lever.getCollisionBox())) {
-				player.isDead = true;
+				player.killPlayer();
 			}
 		}
 		
 		for(Flag flag : flags) {
 			if(player.getColor().getCollisionType(flag.getColor()) == CollisionType.DEATH &&
 					player.getCollisionBox().overlaps(flag.getCollisionBox())) {
-				player.isDead = true;
+				player.killPlayer();
 			}
 			if(!flag.isActive && player.getColor().getCollisionType(flag.getColor()) == CollisionType.SOLID &&
 					player.getCollisionBox().overlaps(flag.getCollisionBox())) {
@@ -358,7 +358,7 @@ public class GameScreen extends GameState {
 				reloadMap();
 			} catch(IOException e) {
 				outOfMaps = true;
-				loadNextMap();
+				loadMap("res/map/partylevel.map");
 			}
 		}
 	}

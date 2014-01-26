@@ -1,7 +1,6 @@
 package ggj14.cg.editor;
 
 import ggj14.cg.ColorType;
-import ggj14.cg.Flag;
 import ggj14.cg.GameScreen;
 import ggj14.cg.ImageOps;
 import ggj14.cg.SpritePanel;
