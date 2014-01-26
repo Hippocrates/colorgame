@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class Flag implements Drawable {
 	
 	public static final int COLLISION_X_OFFSET = 3;
-	public static final int COLLISION_WIDTH = 1;
+	public static final int COLLISION_WIDTH = 10;
 	public static final int COLLISION_Y_OFFSET = 0;
 	public static final int COLLISION_HEIGHT = 14;
 

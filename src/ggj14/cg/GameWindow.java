@@ -69,6 +69,8 @@ public class GameWindow extends JFrame {
 					if(!stateStack.isEmpty()) {
 						GameState state = stateStack.peek();
 						
+						//Make sure we don't simulate for too long, primarily for testing purposes
+						if(elapsed > 0.5) {elapsed = 0.5;}
 						state.update(elapsed);
 						
 						//display

@@ -24,7 +24,7 @@ public class MainScreen extends GameState {
 	public MainScreen() {
 		menu = new ArrayList<MenuItem>();
 		menu.add(MenuItem.MENU_START);
-		menu.add(MenuItem.MENU_OPTIONS);
+		menu.add(MenuItem.MENU_CONTROLS);
 		menu.add(MenuItem.MENU_CREDITS);
 		menu.add(MenuItem.MENU_EDITOR);
 		menu.add(MenuItem.MENU_EXIT);
@@ -95,7 +95,7 @@ public class MainScreen extends GameState {
 			nextState(new GameScreen());
 			break;
 			//TODO: Options and credits screens
-		case MENU_OPTIONS:
+		case MENU_CONTROLS:
 			break;
 		case MENU_CREDITS:
 			break;
@@ -110,7 +110,7 @@ public class MainScreen extends GameState {
 	
 	private static enum MenuItem {
 		MENU_START("Start Game"),
-		MENU_OPTIONS("Options"),
+		MENU_CONTROLS("Controls"),
 		MENU_CREDITS("Credits"),
 		MENU_EDITOR("Editor"),
 		MENU_EXIT("Exit Game");

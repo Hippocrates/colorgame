@@ -26,7 +26,11 @@ public class GameScreen extends GameState {
 	public static final int FLAG_X = 16;
 	public static final int FLAG_Y = 16;
 	
-	public String levelStr = "res/map/testflag.map";
+	public ArrayList<String> levelList;
+	public String levelStr;
+	
+	public boolean outOfMaps = false;
+	public int currentMap = 0;
 	
 	public GameScreen()
 	{
@@ -37,7 +41,7 @@ public class GameScreen extends GameState {
 			leverSets = loadSpriteSheets("res/img/lever.png", PLR_X, PLR_Y);
 			flagSets = loadSpriteSheets("res/img/flag.png", PLR_X, PLR_Y);
 
-			loadMap(levelStr);
+			loadNextMap();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -67,6 +71,13 @@ public class GameScreen extends GameState {
 	
 	public ArrayList<Lever> levers;
 	public ArrayList<Flag> flags;
+	
+	//has this level been beaten or lost?
+	private boolean hasWon;
+	private boolean hasLost;
+	
+	private double animTimer;
+	private final double transitionAnimLength = 3;
 	
 	//keep these cached so that if down is held, we don't keep checking for lever press
 	private boolean p1lever = false;
@@ -148,11 +159,22 @@ public class GameScreen extends GameState {
 	
 	public void update(double s)
 	{
+		animTimer += s;
+		
 		for(Lever lever : levers) {
 			lever.update(s); //Levers only animate during update
 		}
+		boolean allActive = true;
 		for(Flag flag : flags) {
 			flag.update(s); //Levers only animate during update
+			allActive &= flag.isActive;
+		}
+		
+		if(allActive && !hasWon && !hasLost) {
+			hasWon = true;
+			plr1.setHasWon(true);
+			plr2.setHasWon(true);
+			animTimer = 0;
 		}
 		
 		plr1.update(s, tileMap, camera);
@@ -162,11 +184,35 @@ public class GameScreen extends GameState {
 		collidePlayerWithObjects(plr1);
 		collidePlayerWithObjects(plr2);
 		
+		if ((plr1.isDead || plr2.isDead) && !hasLost && !hasWon) {
+			hasLost = true;
+			plr1.setHasLost(true);
+			plr2.setHasLost(true);
+			animTimer = 0;
+			/*try
+			{
+				reloadMap();
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}*/
+		}
+
 		// re-start level
-		if (plr1.isDead || plr2.isDead) {
+		if(hasLost && animTimer >= transitionAnimLength) {
 			try
 			{
-				loadMap(levelStr);
+				reloadMap();
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			//go to next level
+		} else if(hasWon && animTimer >= transitionAnimLength) {
+			currentMap++;
+			try
+			{
+				loadNextMap();
 			}
 			catch (IOException e) {
 				throw new RuntimeException(e);
@@ -287,15 +333,16 @@ public class GameScreen extends GameState {
 				cameraDraw(tileSets, tile, g2d, pos, pos2);
 			}
 		}
-
-		cameraDraw(playerSets, plr1, g2d, plr1.getPos(), plr1.getPos2());
-		cameraDraw(playerSets, plr2, g2d, plr2.getPos(), plr2.getPos2());
-
-		for(Lever lever : levers) {
-			cameraDraw(leverSets, lever, g2d, lever.getPos(), lever.getPos2());
-		}
+		
 		for(Flag flag : flags) {
 			cameraDraw(flagSets, flag, g2d, flag.getPos(), flag.getPos2());
+		}
+		
+		cameraDraw(playerSets, plr1, g2d, plr1.getPos(), plr1.getPos2());
+		cameraDraw(playerSets, plr2, g2d, plr2.getPos(), plr2.getPos2());
+		
+		for(Lever lever : levers) {
+			cameraDraw(leverSets, lever, g2d, lever.getPos(), lever.getPos2());
 		}
 		
 	}
@@ -311,12 +358,32 @@ public class GameScreen extends GameState {
 		}
 	}
 	
+	public void loadNextMap() throws IOException {
+		if(!outOfMaps) {
+			try {
+				levelStr = "res/map/level" + currentMap + ".map";
+				reloadMap();
+			} catch(IOException e) {
+				outOfMaps = true;
+				loadNextMap();
+			}
+		}
+	}
+	
 	public void loadMap(String filename) throws IOException {
+		levelStr = filename;
+		reloadMap();
+	}
+	
+	public void reloadMap() throws IOException {
 
 		levers = new ArrayList<Lever>();
 		flags = new ArrayList<Flag>();
 		
-		Scanner scanner = new Scanner(new FileReader(filename));
+		hasWon = false;
+		hasLost = false;
+		
+		Scanner scanner = new Scanner(new FileReader(levelStr));
 		
 		try {
 		
