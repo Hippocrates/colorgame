@@ -10,10 +10,10 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-public class EditorPlayer implements Selectable {
+public class EditorFlag implements Selectable {
 
-	public static final int PLR_X = EditorMainWindow.PLR_X;
-	public static final int PLR_Y = EditorMainWindow.PLR_Y;
+	public static final int FLAG_X = EditorMainWindow.FLAG_X;
+	public static final int FLAG_Y = EditorMainWindow.FLAG_Y;
 
 	public int x;
 	public int y;
@@ -24,15 +24,16 @@ public class EditorPlayer implements Selectable {
 	static {
 		images = new BufferedImage[ColorType.size()];
 
-		BufferedImage original = EditorMainWindow.toolSets.getImage(0, 0);
+		BufferedImage original = EditorMainWindow.toolSets.getImage(5, 0);
 		for(ColorType c : ColorType.values()) {
 			images[c.ordinal()] = ImageOps.makeColouredImage(original, c.getColor());
 		}
 	}
 
-	public EditorPlayer(int x, int y, ColorType color, EditorMainWindow editor) {
+	public EditorFlag(int x, int y, ColorType color, EditorMainWindow editor) {
 		this.x = x;
 		this.y = y;
+		if(color == ColorType.BLANK) {color = ColorType.RED;}
 		this.color = color;
 		this.editor = editor;
 	}
@@ -46,7 +47,7 @@ public class EditorPlayer implements Selectable {
 	@Override
 	public Rectangle getRect(int xShift, int yShift) {
 		// TODO Auto-generated method stub
-		return new Rectangle(x - xShift, (editor.yDim - 1) * PLR_Y - y - yShift, PLR_X, PLR_Y);
+		return new Rectangle(x - xShift, (editor.yDim - 1) * FLAG_Y - y - yShift, FLAG_X, FLAG_Y);
 	}
 
 	@Override
@@ -61,7 +62,7 @@ public class EditorPlayer implements Selectable {
 	@Override
 	public void draw(Graphics g, int xShift, int yShift) {
 		// TODO Auto-generated method stub
-		g.drawImage(images[color.ordinal()], x - xShift, (editor.yDim - 1) * PLR_Y - y - yShift, null);
+		g.drawImage(images[color.ordinal()], x - xShift, (editor.yDim - 1) * FLAG_Y - y - yShift, null);
 	}
 
 	@Override
@@ -71,25 +72,25 @@ public class EditorPlayer implements Selectable {
 
 		//draw a white box
 		g.setColor(Color.WHITE);
-		g.drawRect(x - xShift, (editor.yDim - 1) * PLR_Y - y - yShift,
-				PLR_X, PLR_Y);
+		g.drawRect(x - xShift, (editor.yDim - 1) * FLAG_Y - y - yShift,
+				FLAG_X, FLAG_Y);
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e, int xShift, int yShift) {
 		int x1 = e.getX() - editor.insets.left + xShift;
-		int y1 = editor.yDim * PLR_Y - (e.getY() - editor.insets.top) + yShift;
+		int y1 = editor.yDim * FLAG_Y - (e.getY() - editor.insets.top) + yShift;
 		
 		int newX;
 		int newY;
 		
 		//snap if shift is not held
 		if((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK) {
-			newX = x1 - PLR_X / 2;
-			newY = y1 - PLR_Y / 2;
+			newX = x1 - FLAG_X / 2;
+			newY = y1 - FLAG_Y / 2;
 		} else {
-			newX = PLR_X * (x1 / PLR_X);
-			newY = PLR_Y * (y1 / PLR_Y);
+			newX = FLAG_X * (x1 / FLAG_X);
+			newY = FLAG_Y * (y1 / FLAG_Y);
 		}
 		
 		//if they are both the same, do nothing
@@ -112,7 +113,7 @@ public class EditorPlayer implements Selectable {
 
 	@Override
 	public void setColor(ColorType c) {
-		if(c == ColorType.BLANK || c == ColorType.WHITE) {return;}
+		if(c == ColorType.BLANK) {return;}
 		
 		color = c;
 		editor.repaint();
@@ -124,12 +125,12 @@ public class EditorPlayer implements Selectable {
 		int newX = x;
 		int newY = y;
 		
-		//assert they fall within reasonable bounds and not touching map edge
-		if(newX < PLR_X) {newX = PLR_X;}
-		if(newY < PLR_Y) {newY = PLR_Y;}
+		//assert they are not past map edge
+		if(newX < 0) {newX = 0;}
+		if(newY < 0) {newY = 0;}
 
-		if(newX > PLR_X * (editor.xDim - 2)) {newX = PLR_X * (editor.xDim - 2);}
-		if(newY > PLR_Y * (editor.yDim - 2)) {newY = PLR_Y * (editor.yDim - 2);}
+		if(newX > FLAG_X * (editor.xDim - 1)) {newX = FLAG_X * (editor.xDim - 1);}
+		if(newY > FLAG_Y * (editor.yDim - 1)) {newY = FLAG_Y * (editor.yDim - 1);}
 		
 		//if they are both the same, do nothing
 		if(newX != x || newY != y) {
@@ -146,8 +147,9 @@ public class EditorPlayer implements Selectable {
 
 	@Override
 	public String toOutputString() {
-		// We don't need to do this, outputted separately
-		return "";
+		return "FLAG\n"
+				+ color.getCode() + " " + x + " " + y + "\n"
+				+ "0";
 	}
 
 }

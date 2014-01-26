@@ -45,7 +45,7 @@ public class Player implements Drawable {
 	private boolean hasLost = false;
 	
 	public void jumpPressed() {
-		if ((!isFalling || fallDur < fallCutoff) && !hasWon) {
+		if ((!isFalling || fallDur < fallCutoff) && !hasWon && !hasLost) {
 			yv = 95;
 			isFalling = true;
 			fallDur = fallCutoff;

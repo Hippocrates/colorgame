@@ -20,6 +20,7 @@ public interface Selectable {
 	public void move(int dx, int dy); //move this
 	
 	public void setColor(ColorType c); //change color, if possible
+	public String toOutputString();
 	
 	public void checkBounds(); //tells this to adjust its location eg the map size changed
 	

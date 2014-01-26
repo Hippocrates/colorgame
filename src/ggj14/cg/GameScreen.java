@@ -189,13 +189,6 @@ public class GameScreen extends GameState {
 			plr1.setHasLost(true);
 			plr2.setHasLost(true);
 			animTimer = 0;
-			/*try
-			{
-				reloadMap();
-			}
-			catch (IOException e) {
-				throw new RuntimeException(e);
-			}*/
 		}
 
 		// re-start level

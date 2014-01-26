@@ -1,6 +1,7 @@
 package ggj14.cg.editor;
 
 import ggj14.cg.ColorType;
+import ggj14.cg.Flag;
 import ggj14.cg.GameScreen;
 import ggj14.cg.ImageOps;
 import ggj14.cg.SpritePanel;
@@ -43,6 +44,9 @@ public class EditorMainWindow extends JFrame implements KeyListener, MouseListen
 
 	public static final int PLR_X = GameScreen.PLR_X;
 	public static final int PLR_Y = GameScreen.PLR_Y;
+
+	public static final int FLAG_X = GameScreen.FLAG_X;
+	public static final int FLAG_Y = GameScreen.FLAG_Y;
 	
 	//some key constants
 	public static final int KEY_LEFT = KeyEvent.VK_LEFT;
@@ -288,6 +292,17 @@ public class EditorMainWindow extends JFrame implements KeyListener, MouseListen
 						plr2.set(playerX, playerY, color);
 					}
 				}
+				else if (command.equalsIgnoreCase("FLAG")) {
+
+					tokens = scanner.nextLine().split("\\s+");
+					
+					ColorType color = ColorType.fromCode(tokens[0].charAt(0));
+					int x = (int) Float.parseFloat(tokens[1]);
+					int y = (int) Float.parseFloat(tokens[2]);
+					
+					EditorFlag flag = new EditorFlag(x, y, color, this);
+					selectables.add(flag);
+				}
 			}
 		}
 		finally {
@@ -327,6 +342,13 @@ public class EditorMainWindow extends JFrame implements KeyListener, MouseListen
 			//Output hero location
 			writer.println("PLAYER1 " + plr1.color.getCode() + " " + plr1.x + " " + plr1.y);
 			writer.println("PLAYER2 " + plr2.color.getCode() + " " + plr2.x + " " + plr2.y);
+			
+			//Output everything else
+			for(Selectable s : selectables) {
+				if(!(s instanceof EditorPlayer)) {
+					writer.println(s.toOutputString());
+				}
+			}
 			
 			writer.close();
 			
@@ -406,6 +428,11 @@ public class EditorMainWindow extends JFrame implements KeyListener, MouseListen
 			deleteObjects(e);
 		} else if(cat == 1 && index == 3) { //paint tool
 			colorBlock(e);
+		} else if(cat == 1 && index == 5) { //flag tool
+			EditorFlag flag = new EditorFlag(0, 0, palette.getPaintIndex(), this);
+			selectables.add(flag);
+			selected = flag;
+			flag.mouseDragged(e, xShift, yShift);
 		}
 	}
 
